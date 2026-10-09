@@ -215,3 +215,4 @@ Zur Laufzeit sieht der Prozess also dieselben Page-Flags wie
 ein C-Programm mit `malloc`/`free` – nur dass die Freigabe
 deterministisch am Scope-Ende passiert und nicht manuell
 vergessen werden kann.
+
