@@ -12,7 +12,7 @@ mod ccat_markdown;
 
 use crate::state::State;
 use crate::detect_filetype::detect_language;
-use crate::highlighter::{highlight_line, print_binary_file};
+use crate::highlighter::highlight_line;
 use crate::col::HighlightConfig;
 use crate::language::Language;
 use crate::ccat_markdown::{md_html_main, md_ansi_main};
@@ -20,13 +20,12 @@ use crate::specials::{print_hex_file, log_highlight_line, to_c_array};
 
 const INFO_TEXT: &str = r#"
 Syntax: ccat <datei> [Optionen]
-@VERSION 2.9.5 Rust
+@VERSION 2.9.6 Rust
 
 c <filename> <options ...>
 
 Optionen:
     n   = Zeilennummern anzeigen
-    b   = Binärdatei als Hex-Dump ausgeben
     r   = Remove all ANSI (save mode)
     h   = print as HTML Source
     a   = print file as C Hexadezimal Array
@@ -171,15 +170,14 @@ fn get_int_by_string(s: String) -> u64
 }
 
 /**
- * ================================================
+ * ==================================================================
  * Einstiegspunkt von CCAT
- * ================================================
+ * ==================================================================
  *
  * Ablauf:
  *
  * 1. Argumente lesen; bei fehlendem Dateinamen Hilfe ausgeben.
- * 2. Optionen (`n`, `b`, `r`, `h`, `x`, `a`, `-s`) in den
- *    State schreiben.
+ * 2. Optionen (`n`, `r`, `h`, `x`, `a`, `-s`) in den State schreiben.
  * 3. Sprache über detect_language bestimmen.
  * 4. Datei einlesen oder bei Binary-Modus überspringen
  * 5. Je nach Flags einen der Spezialpfade wählen
@@ -203,7 +201,6 @@ fn main() {
         for ch in args[2].chars() {
             match ch {
                 'n' => state.flag_nr = true,
-                'b' => state.print_binary = true,
                 'r' => state.remove_all_ansi = true,
                 'h' => state.html_color = true,
                 'x' => state.hex = true,
@@ -221,10 +218,6 @@ fn main() {
     let lang = detect_language(filename);
     let mut source = String::new();
     let mut source_len = 0x1000;
-    if !state.print_binary {
-        read_file_with_hex_fallback(filename, &mut source);
-        source_len = source.len();
-    }
     let mut output = String::with_capacity(source_len * 2);
     let mut jump: bool = false;
     let config = if state.html_color {
@@ -244,10 +237,6 @@ fn main() {
     }
     if state.to_c_array {
         to_c_array(filename, &config);
-        jump = true;
-    }
-    if state.print_binary {
-        print_binary_file(filename, &mut output, &mut state, &config);
         jump = true;
     }
     if state.remove_all_ansi {

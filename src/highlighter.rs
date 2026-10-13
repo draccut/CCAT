@@ -254,18 +254,18 @@ pub fn highlight_line(line: &str, lang: Language, config: &HighlightConfig, resu
                 }
             }
             let is_kw = match lang {
-                Language::Python          => is_keyword(&buf, PYTHON_KEYWORDS),
-                Language::JavaScript      => is_keyword(&buf, JS_KEYWORDS),
-                Language::Clang          => is_keyword(&buf, KEYWORDS_C),
-                Language::Shell           => is_keyword(&buf, SHELL_KEYWORDS),
-                Language::Docker          => is_keyword(&buf, DOCKER_KEYWORDS),
-                Language::AsmX86          => is_keyword(&buf, ASM_X86_KEYWORDS),
-                Language::Asm8051         => is_keyword(&buf, ASM_8051_KEYWORDS),
-                Language::Sql             => is_keyword(&buf, SQL_KEYWORDS),
-                Language::Rust            => is_keyword(&buf, RUST_KEYWORDS),
-                Language::LangDockerCompose   => is_keyword(&buf, DOCKER_COMPOSE_KEYWORDS),
-                Language::LangJava        => is_keyword(&buf, JAVA_KEYWORDS),
-                _                         => false,
+                Language::Python                => is_keyword(&buf, PYTHON_KEYWORDS),
+                Language::JavaScript            => is_keyword(&buf, JS_KEYWORDS),
+                Language::Clang                 => is_keyword(&buf, KEYWORDS_C),
+                Language::Shell                 => is_keyword(&buf, SHELL_KEYWORDS),
+                Language::Docker                => is_keyword(&buf, DOCKER_KEYWORDS),
+                Language::AsmX86                => is_keyword(&buf, ASM_X86_KEYWORDS),
+                Language::Asm8051               => is_keyword(&buf, ASM_8051_KEYWORDS),
+                Language::Sql                   => is_keyword(&buf, SQL_KEYWORDS),
+                Language::Rust                  => is_keyword(&buf, RUST_KEYWORDS),
+                Language::LangDockerCompose     => is_keyword(&buf, DOCKER_COMPOSE_KEYWORDS),
+                Language::LangJava              => is_keyword(&buf, JAVA_KEYWORDS),
+                _                               => false,
             };
             if is_kw {
                 result.push_str(config.color_keyword);
@@ -282,67 +282,4 @@ pub fn highlight_line(line: &str, lang: Language, config: &HighlightConfig, resu
     return false;
 }
 
-/**
- * Liest eine Binärdatei und gibt sie als farbigen Hex-Dump aus
- * (ähnlich `hexdump -C`).
- *
- * Jede Zeile enthält:
- * - Offset in Hex
- * - optional eine fortlaufende Zeilennummer (bei Newlines)
- * - 8 Bytes als Hex-Werte
- * - ASCII-Darstellung (nicht druckbare Zeichen als `.`)
- *
- * # Arguments
- *  `filepath` – Pfad zur zu lesenden Datei.
- *  `output`   – Ziel-String für die formatierte Ausgabe.
- *  `state`    – Zustand (u. a. `flag_nr` für Zeilennummern).
- *  `config`   – Highlight-Konfiguration.
- */
-pub fn print_binary_file(filepath: &str, output: &mut String, state: &mut State, config: &HighlightConfig) {
-    let bytes = match fs::read(filepath) {
-        Ok(b) => b,
-        Err(e) => {
-            output.push_str(&format!("Fehler beim Lesen der Datei: {}\n", e));
-            return;
-        }
-    };
-    if bytes.is_empty() {
-        output.push_str("Datei ist leer.\n");
-        return;
-    }
-    let mut line_nr: u64 = 0;
-    for (i, chunk) in bytes.chunks(8).enumerate() {
-        output.push_str(config.color_header);
-        output.push_str(&format!("{:08x}  ", i * 8));
-        output.push_str(config.color_reset);
-        if state.flag_nr == true {
-            output.push_str(config.color_string);
-            output.push_str(&format!("{:08} ", line_nr));
-            output.push_str(config.color_reset);
-        }
-        output.push_str(config.color_keyword);
-        let new_line_char: &u8 = &0xA;
-        for byte in chunk {
-            if byte == new_line_char {
-                line_nr += 1;
-            }
-            output.push_str(&format!("{:02x} ", byte));
-        }
-        output.push_str(config.color_reset);
-        output.push_str(config.color_comment);
-        for _ in chunk.len()..8 {
-            output.push_str("   ");
-        }
-        output.push_str(config.color_reset);
-        output.push_str("  |");
-        for &byte in chunk {
-            if (32..=126).contains(&byte) {
-                output.push(byte as char);
-            } else {
-                output.push('.');
-            }
-        }
-        output.push_str("|\n");
-    }
-    output.push_str(&format!("\n{} Bytes insgesamt.\n", bytes.len()));
-}
+

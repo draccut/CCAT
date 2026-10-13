@@ -2,7 +2,6 @@
 pub struct State {
     pub line_nr: u64,
     pub flag_nr: bool,
-    pub print_binary: bool,
     pub remove_all_ansi: bool,
     pub html_color: bool,
     pub hex: bool,
@@ -15,7 +14,6 @@ impl State {
         Self {
             line_nr: 0,
             flag_nr: false,
-            print_binary: false,
             remove_all_ansi: false,
             html_color: false,
             hex: false,
