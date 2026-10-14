@@ -1,6 +1,6 @@
 # CCAT
 
-ANSI und HTML fähiger Syntax-Highlighter mit Hex-Dump Logfile parsing und Markdown Unterstützung
+Syntax-Highlighter für Quellcode, Hex-Dump, Logfiles und Markdown
 
 ----
 
